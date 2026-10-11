@@ -1,0 +1,10 @@
+fastapi
+pydantic
+uvicorn 
+pytesseract
+groq
+ollama
+
+openai
+python-dotenv
+python-multipart
