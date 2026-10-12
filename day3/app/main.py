@@ -1,6 +1,7 @@
 from fastapi  import FastAPI,HTTPException,File, UploadFile
 
 
+import json
 from typing import Annotated
 import logging
 
@@ -72,19 +73,23 @@ def parse():
         }
     }
 
+
+
 @app.post("/parse_pdf")
 async def upload_file(file: UploadFile = File(...)):
     try:
-        pdf_text = []
         content = await file.read()
         doc = pymupdf.open(stream=content, filetype="pdf")
 
+        pdf_text = ""
         for page in doc:
-            text = page.get_text()
-            pdf_text.append(text)
+            pdf_text += page.get_text()
 
-        parsed_text = parse_resume("\n".join(pdf_text))
-        logger.info("PDF resume parsed successfully")
+        parsed_text = parse_resume(pdf_text)
+
+        
+        if isinstance(parsed_text, str):
+            parsed_text = json.loads(parsed_text)
 
         return {
             "success": True,
@@ -96,5 +101,7 @@ async def upload_file(file: UploadFile = File(...)):
         }
 
     except Exception as e:
-        logger.error(f"Error reading PDF: {e}")
-        return {"success": False, "message": str(e)}
+        return {
+            "success": False,
+            "message": str(e)
+        }
