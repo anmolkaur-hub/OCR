@@ -18,14 +18,23 @@ def parse_resume(resume_texts):
 
     You will receive a list of resume texts.
     Extract the following fields from each resume:
+    Also include the experince timeline in response ("Experience_timeline": [
+              "Software Engineer at XYZ Company (2020-2022)",
+              "Intern at ABC Company (2019-2020)"
+            ])
     - Name
     - Education
-    - Experience
+    -Experience(in years)
+    -Experience_timeline
     - Skills
     - DOB
     - email
     - phone
     - Address
+    -additional information,
+    -projects,
+    -certifications,
+    
 
     If a field is missing, use "N/A".
     Return only a valid JSON array of objects and nothing else.
@@ -39,7 +48,8 @@ def parse_resume(resume_texts):
       {{
         "Name": "Anmol Kaur",
         "Education": "B.Tech CSE",
-        "Experience": [
+        "Experince(yrs):":"5yrs"
+        "Experience_timeline": [
           "Software Engineer at XYZ Company (2020-2022)",
           "Intern at ABC Company (2019-2020)"
         ],
@@ -47,20 +57,29 @@ def parse_resume(resume_texts):
         "DOB": "May 12, 1998",
         "email": "anmol@example.com",
         "phone": "12343424",
-        "Address": "123, Ludhiana"
+        "Address": "123, Ludhiana",
+        "projects":"Airbnb "
+        "certifications":"Webdev certificate",
+        "Additional_information":"hobbies,languages,etc"
+
+
       }},
       {{
-        "Name": "Pop Kaur",
-        "Education": "B.Tech CSE",
-        "Experience": [
-          "Software Engineer at XYZ Company (2020-2022)",
-          "Intern at ABC Company (2019-2020)"
-        ],
-        "Skills": "React, Python, SQL",
-        "DOB": "May 12, 1998",
-        "email": "pop@example.com",
-        "phone": "12343424",
-        "Address": "178, Ludhiana"
+        "Name": "popu Kaur",
+               "Education": "B.Tech CSE",
+               "Experince(yrs):":"5yrs"
+               "Experience_timeline": [
+                 "Software Engineer at XYZ Company (2020-2022)",
+                 "Intern at ABC Company (2019-2020)"
+               ],
+               "Skills": "React, Python, Java, JavaScript, SQL",
+               "DOB": "May 12, 1998",
+               "email": "anmol@example.com",
+               "phone": "12343424",
+               "Address": "123, Ludhiana",
+               "projects":"Airbnb "
+               "certifications":"Webdev certificate",
+               "Additional_information":"hobbies,languages,etc"
       }}
     ]
 
@@ -97,8 +116,11 @@ def compare_resume_with_jd(resume_text, job_description):
         "decision": "Accepted",
         "matching_skills": ["Python", "SQL"],
         "missing_skills": ["Docker"],
+        "resume_score":"80%",
+        "technical_score":90%,
         "experience_match": "Good",
-        "reason": "Brief explanation of the rating"
+        "reason": "Brief explanation of the rating",
+
     }}
    Rules:
 1. Give a rating from 1 to 5 based on the JD requirements.
@@ -121,6 +143,7 @@ def compare_resume_with_jd(resume_text, job_description):
     )
     result_text = response.choices[0].message.content
     result = json.loads(result_text)
+    print(result)
     return result
 
 
