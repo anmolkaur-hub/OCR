@@ -1,17 +1,17 @@
-from fastapi  import FastAPI,HTTPException,File, UploadFile
+from fastapi  import FastAPI,HTTPException,File, UploadFile,Form
 
 
 import json
 from typing import Annotated
 import logging
 
-from app.template import parse_resume
+from app.template import parse_resume,compare_resume_with_jd
 import pymupdf
 
 
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(
+logging.basicConfig(                                                                                                                            
     level=logging.INFO
 )
 
@@ -105,3 +105,34 @@ async def upload_file(file: UploadFile = File(...)):
             "success": False,
             "message": str(e)
         }
+
+
+@app.post("/screen_resume")
+async def screen_resume(
+    file: UploadFile = File(...),
+    job_description: str = Form(...)
+):
+    try:
+        content = await file.read()
+        doc = pymupdf.open(stream=content, filetype="pdf")
+
+        resume_text = ""
+        for page in doc:
+            resume_text += page.get_text()
+
+        result = compare_resume_with_jd(
+            resume_text,
+            job_description
+        )
+
+        return {
+            "success": True,
+            "data": result
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
+
