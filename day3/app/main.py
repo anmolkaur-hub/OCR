@@ -6,6 +6,7 @@ from typing import Annotated
 import logging
 
 from app.template import parse_resume,compare_resume_with_jd
+from app.schema import Jd
 import pymupdf
 
 
@@ -109,25 +110,50 @@ async def upload_file(file: UploadFile = File(...)):
 
 @app.post("/screen_resume")
 async def screen_resume(
-    file: UploadFile = File(...),
-    job_description: str = Form(...)
+    file: UploadFile = File(...),   
+    jobtitle: str = Form(...),
+    experience: str = Form(...),
+    Skills: str = Form(...),
+    Role: str = Form(...),
+    Qualifications: str = Form(...) 
 ):
     try:
         content = await file.read()
         doc = pymupdf.open(stream=content, filetype="pdf")
-
         resume_text = ""
         for page in doc:
             resume_text += page.get_text()
-
+       
+        parsed_resume_text =json.loads( parse_resume(resume_text))
+       
+        print(parsed_resume_text)
         result = compare_resume_with_jd(
-            resume_text,
-            job_description
+           parsed_resume_text,
+            {
+                "jobtitle": jobtitle,
+                "experience": experience,
+                "Skills":  Skills,
+                "Role":  Role,
+                "Qualifications": Qualifications,
+            },
         )
 
         return {
             "success": True,
-            "data": result
+            "data":{
+           
+                "candidate_name": result["candidate_name"],
+                  "rating": result["rating"],
+                    "decision": result["decision"],
+                    "matching_skills": result["matching_skills"],
+                    "resume_score":result["resume_score"],
+                    "technical_score":result["technical_score"],
+                   "missing_skills":result["missing_skills"],
+                   "experience_match": result["experience_match"],
+                  "reason": result["reason"]  ,
+                  
+                
+                            }
         }
 
     except Exception as e:
